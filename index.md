@@ -13,4 +13,8 @@ Bombay's mills drew workers from across the region. Conditions inside were harsh
 
 ![A Bombay cotton mill](images/mill1.jpeg)
 
+![A Bombay cotton mill](images/mill2.jpeg)
+
+![A Bombay cotton mill](images/mill3.jpeg)
+
 The mills connected the city to a wider world of trade and labour.
