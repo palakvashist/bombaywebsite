@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- ===================================================================== -->
+  <!--  EDIT ZONE: your project title. Change ONLY the text between the tags. -->
+  <!--  Change it in BOTH places below (the <title> and the <h1>).           -->
+  <!-- ===================================================================== -->
+  <title>My Interconnected Place</title>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    html, body { margin:0; height:100%; font-family:'Helvetica Neue',system-ui,sans-serif; background:#0b1020; }
+    #map { height:100%; width:100%; background:#0b1020; }
+    .title-card{ position:absolute; top:18px; left:18px; z-index:1000; background:rgba(16,22,40,0.88); color:#eaf0ff; padding:16px 20px; border-radius:10px; max-width:300px; border:1px solid rgba(120,160,255,0.25); box-shadow:0 4px 30px rgba(0,0,0,0.6); }
+    .title-card h1{ margin:0 0 6px; font-size:1.2rem; font-weight:700; color:#fff; }
+    .title-card p{ margin:0; font-size:0.82rem; color:#9fb3d9; line-height:1.5; }
+    .legend{ position:absolute; bottom:24px; left:18px; z-index:1000; background:rgba(16,22,40,0.88); color:#cdd8f0; padding:12px 16px; border-radius:10px; font-size:0.8rem; border:1px solid rgba(120,160,255,0.25); box-shadow:0 4px 30px rgba(0,0,0,0.6); }
+    .legend .row{ display:flex; align-items:center; margin:5px 0; }
+    .legend .dot{ width:12px; height:12px; border-radius:50%; margin-right:9px; }
+    .legend .within{ background:#ff6b4a; box-shadow:0 0 8px #ff6b4a; }
+    .legend .connected{ background:#4ad8ff; box-shadow:0 0 8px #4ad8ff; }
+    .legend .flow{ width:20px; height:0; border-top:2px solid #ffd36b; margin-right:7px; box-shadow:0 0 6px #ffd36b; }
+    .legend .poly{ width:12px; height:12px; background:rgba(120,160,255,0.25); border:1px solid #7aa0ff; margin-right:9px; }
+    .leaflet-popup-content-wrapper{ background:#121831; color:#eaf0ff; border-radius:8px; box-shadow:0 6px 30px rgba(0,0,0,0.7); }
+    .leaflet-popup-tip{ background:#121831; }
+    .leaflet-popup-content{ margin:0; }
+    .pop{ width:240px; }
+    .pop .hdr{ padding:11px 15px; border-radius:8px 8px 0 0; }
+    .pop .hdr.within{ background:linear-gradient(135deg,#ff6b4a,#c0392b); }
+    .pop .hdr.connected{ background:linear-gradient(135deg,#4ad8ff,#2b7fa3); }
+    .pop .hdr.neutral{ background:linear-gradient(135deg,#7aa0ff,#4a5fa3); }
+    .pop .hdr .name{ font-size:1.1rem; font-weight:700; color:#fff; }
+    .pop .hdr .date{ font-size:0.72rem; color:rgba(255,255,255,0.85); margin-top:3px; letter-spacing:0.08em; text-transform:uppercase; }
+    .pop .body{ padding:12px 15px; }
+    .pop .desc{ font-size:0.88rem; line-height:1.5; color:#dfe7f7; margin-bottom:10px; }
+    .pop .meta{ font-size:0.75rem; color:#90a2c8; border-top:1px solid rgba(255,255,255,0.1); padding-top:8px; }
+    .pop .meta div{ margin:2px 0; } .pop .meta b{ color:#cdd8f0; }
+    .place-label{ background:transparent; border:none; box-shadow:none; color:#eaf0ff; font-size:11px; font-weight:600; text-shadow:0 0 4px #0b1020,0 0 6px #0b1020; }
+    .leaflet-control-layers{ background:rgba(16,22,40,0.9); color:#cdd8f0; border:1px solid rgba(120,160,255,0.25); border-radius:8px; }
+    .leaflet-control-layers label{ color:#cdd8f0; }
+    .leaflet-bar a{ background:#121831; color:#cdd8f0; border-color:#2a3350; }
+    @keyframes flow { to { stroke-dashoffset:-1000; } }
+    .flow-line{ stroke-dasharray:8 12; animation:flow 30s linear infinite; }
+  </style>
+</head>
+<body>
+  <div class="title-card">
+    <!-- EDIT ZONE: change this heading to your project title -->
+    <h1>My Interconnected Place</h1>
+    <p>A place and the places it was connected to.</p>
+  </div>
+  <div class="legend">
+    <div class="row"><span class="dot within"></span>Within</div>
+    <div class="row"><span class="dot connected"></span>Connected</div>
+    <div class="row"><span class="flow"></span>Connection</div>
+    <div class="row"><span class="poly"></span>Region</div>
+  </div>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const map = L.map("map").setView([20,20],3);
+
+    // Free dark basemap from Esri (no API key). Do not change this.
+    L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",{
+      maxZoom:16, attribution:"Tiles &copy; Esri"
+    }).addTo(map);
+
+    function clean(v){ return (v===null||v===undefined)?"":String(v).trim(); }
+    function cat(p){ return clean(p.type || p.Type).toLowerCase(); }
+
+    function popupHtml(p){
+      const name=clean(p.Name)||clean(p.name)||"Untitled", date=clean(p.Date)||clean(p.date),
+            desc=clean(p.Description)||clean(p.description), src=clean(p.Source)||clean(p.source),
+            kind=clean(p.kind)||clean(p.Kind), c=cat(p);
+      const hc=(c==="within")?"within":(c==="connected")?"connected":"neutral";
+      let h='<div class="pop"><div class="hdr '+hc+'"><div class="name">'+name+'</div>';
+      if(date) h+='<div class="date">'+date+'</div>';
+      h+='</div><div class="body">';
+      if(desc) h+='<div class="desc">'+desc+'</div>';
+      let m=""; if(kind) m+='<div><b>Type:</b> '+kind+'</div>'; if(src) m+='<div><b>Source:</b> '+src+'</div>';
+      if(m) h+='<div class="meta">'+m+'</div>';
+      return h+'</div></div>';
+    }
+
+    const pointsLayer=L.layerGroup(), flowLayer=L.layerGroup(), linesLayer=L.layerGroup(), polyLayer=L.layerGroup();
+    const allBounds=[];
+    function remember(l){ if(l.getBounds&&l.getBounds().isValid()) allBounds.push(l.getBounds()); }
+    function fit(){ if(!allBounds.length) return; let b=allBounds[0]; for(let i=1;i<allBounds.length;i++) b=b.extend(allBounds[i]); map.fitBounds(b,{padding:[70,70]}); }
+
+    function curve(a,b){
+      const offset=Math.hypot(b[0]-a[0],b[1]-a[1])*0.15;
+      const mid=[(a[0]+b[0])/2+offset,(a[1]+b[1])/2]; const pts=[]; const steps=40;
+      for(let t=0;t<=steps;t++){ const u=t/steps;
+        pts.push([(1-u)*(1-u)*a[0]+2*(1-u)*u*mid[0]+u*u*b[0], (1-u)*(1-u)*a[1]+2*(1-u)*u*mid[1]+u*u*b[1]]); }
+      return pts;
+    }
+
+    fetch("points.geojson").then(r=>r.json()).then(function(data){
+      let mainLatLng=null; const connected=[];
+      const gj=L.geoJSON(data,{
+        pointToLayer:function(f,latlng){
+          const p=f.properties||{}, c=cat(p);
+          const isWithin=(c==="within");
+          // colour: within = orange, connected = cyan, no type = soft blue (still looks fine)
+          const color = isWithin?"#ff6b4a" : (c==="connected"?"#4ad8ff":"#8aa6e0");
+          if(clean(p.Description).toUpperCase().indexOf("MAIN")>-1) mainLatLng=latlng;
+          if(c==="connected") connected.push(latlng);
+          return L.circleMarker(latlng,{radius:isWithin?9:7,fillColor:color,color:"#fff",weight:1.5,fillOpacity:0.95});
+        },
+        onEachFeature:function(f,layer){
+          layer.bindPopup(popupHtml(f.properties||{}),{maxWidth:250});
+          const nm=clean((f.properties||{}).Name)||clean((f.properties||{}).name);
+          if(nm) layer.bindTooltip(nm,{permanent:true,direction:"right",className:"place-label",offset:[8,0]});
+        }
+      });
+      gj.addTo(pointsLayer); remember(gj);
+      if(!mainLatLng && gj.getLayers().length && gj.getLayers()[0].getLatLng) mainLatLng=gj.getLayers()[0].getLatLng();
+      if(mainLatLng){ connected.forEach(function(ll){ L.polyline(curve([mainLatLng.lat,mainLatLng.lng],[ll.lat,ll.lng]),{color:"#ffd36b",weight:2,opacity:0.7,className:"flow-line"}).addTo(flowLayer); }); }
+      fit();
+    }).catch(e=>console.warn("points:",e));
+
+    fetch("lines.geojson").then(r=>r.json()).then(function(data){
+      const gj=L.geoJSON(data,{style:{color:"#9b7bff",weight:2.5,opacity:0.85,dashArray:"7 7"},onEachFeature:function(f,l){l.bindPopup(popupHtml(f.properties||{}));}});
+      gj.addTo(linesLayer); remember(gj); fit();
+    }).catch(e=>console.warn("lines:",e));
+
+    fetch("polygons.geojson").then(r=>r.json()).then(function(data){
+      const gj=L.geoJSON(data,{style:{color:"#7aa0ff",weight:1.5,fillColor:"#7aa0ff",fillOpacity:0.12},onEachFeature:function(f,l){l.bindPopup(popupHtml(f.properties||{}));}});
+      gj.addTo(polyLayer); remember(gj); fit();
+    }).catch(e=>console.warn("polygons:",e));
+
+    flowLayer.addTo(map); polyLayer.addTo(map); linesLayer.addTo(map); pointsLayer.addTo(map);
+    L.control.layers(null,{"Places":pointsLayer,"Connections":flowLayer,"Routes":linesLayer,"Regions":polyLayer},{collapsed:false}).addTo(map);
+  </script>
+</body>
+</html>
