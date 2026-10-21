@@ -11,6 +11,6 @@ A spatial history of your place and the places it was tied to.
 
 Bombay's mills drew workers from across the region. Conditions inside were harsh and crowded.
 
-![A Bombay cotton mill, around 1890](images/mill.jpg)
+![A Bombay cotton mill, around 1890](images/mill.jpeg)
 
 The mills connected the city to a wider world of trade and labour.
