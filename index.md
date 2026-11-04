@@ -1,3 +1,9 @@
+---
+layout: default
+---
+ 
+{% include nav.html %}
+
 # Your Place and Its World
 
 A spatial history of your place and the places it was tied to.
