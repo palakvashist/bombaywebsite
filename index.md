@@ -4,6 +4,8 @@ layout: default
  
 {% include nav.html %}
 
+[Read the essay](essay.html)
+
 # Your Place and Its World
 
 A spatial history of your place and the places it was tied to.
@@ -19,8 +21,5 @@ Bombay's mills drew workers from across the region. Conditions inside were harsh
 
 ![A Bombay cotton mill](images/mill1.jpeg)
 
-![A Bombay cotton mill](images/mill2.jpeg)
-
-![A Bombay cotton mill](images/mill3.jpeg)
 
 The mills connected the city to a wider world of trade and labour.
