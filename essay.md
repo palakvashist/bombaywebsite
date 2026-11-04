@@ -21,3 +21,8 @@ My primary source were archival sources from LOC.
 ## What my map cannot show- limitations 
  
 One paragraph on what is missing.
+
+![A Bombay cotton mill](images/mill2.jpeg)
+
+![A Bombay cotton mill](images/mill3.jpeg)
+
