@@ -1,0 +1,83 @@
+- title: "Name of the first resource"
+  url: "https://example.org/first"
+  category: "Article"
+  place: "My place"
+  added_by: "My name"
+  note: "One sentence on why it is useful."
+ 
+- title: "Name of the second resource"
+  url: "https://example.org/second"
+  category: "Map"
+  place: "My place"
+  added_by: "My name"
+  note: "One sentence on why it is useful."
+
+  - title: "Name of the second resource"
+  url: "https://example.org/second"
+  category: "Map"
+  place: "My place"
+  added_by: "My name"
+  note: "One sentence on why it is useful."
+
+
+- title: "Name of the second resource"
+  url: "https://example.org/second"
+  category: "Map"
+  place: "My place"
+  added_by: "My name"
+  note: "One sentence on why it is useful."
+
+
+
+- title: "Name of the second resource"
+  url: "https://example.org/second"
+  category: "Map"
+  place: "My place"
+  added_by: "My name"
+  note: "One sentence on why it is useful."
+
+
+
+- title: "Name of the second resource"
+  url: "https://example.org/second"
+  category: "Map"
+  place: "My place"
+  added_by: "My name"
+  note: "One sentence on why it is useful."
+
+
+
+- title: "Name of the second resource"
+  url: "https://example.org/second"
+  category: "Map"
+  place: "My place"
+  added_by: "My name"
+  note: "One sentence on why it is useful."
+
+
+
+- title: "Name of the second resource"
+  url: "https://example.org/second"
+  category: "Map"
+  place: "My place"
+  added_by: "My name"
+  note: "One sentence on why it is useful."
+
+
+
+- title: "Name of the second resource"
+  url: "https://example.org/second"
+  category: "Map"
+  place: "My place"
+  added_by: "My name"
+  note: "One sentence on why it is useful."
+
+
+
+- title: "Name of the second resource"
+  url: "https://example.org/second"
+  category: "Map"
+  place: "My place"
+  added_by: "My name"
+  note: "One sentence on why it is useful."
+
